@@ -1,4 +1,3 @@
-package date;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,9 +18,10 @@ public class Date{
     private String day;
 
     public static void main(String[] args) {
-        System.out.println("XD");
+        System.out.println(new Date("2003-01-01").shiftDate(100));
     }
 
+    //        ISO 4217
     public Date(String date){
         String [] temp = date.split("-",3);
         checkDate(temp[0],temp[1],temp[2]);
@@ -67,23 +67,49 @@ public class Date{
 
 
     //        ISO 4217
-
-
     public boolean isLaterThan(Date endDate) {
-
-    }
-
-    //TODO  it may also work
-    // TODO It may consider also length of months..
-    public Integer dayDifference(Date date) {
-
-
+        return this.getYear() - endDate.getYear() > 0
+            && this.getMonth() - endDate.getMonth() > 0
+                && this.getDay() - endDate.getDay() > 0;
     }
 
 
+    public Date shiftDate(int dayNumber) {
 
-    public Date shiftDate(Integer dayNumber){
+        int yearAdd = 0;
 
+        //YEARS
+        while (dayNumber >= 365) {
+            if (Year.isLeapYear(getYear() + yearAdd) && dayNumber >= 366) {
+                yearAdd++;
+                dayNumber -= 366;
+            } else {
+                yearAdd++;
+                dayNumber -= 365;
+            }
+        }
+
+        //MONTHS
+        Month month = Month.getMonth(getMonth(), getYear() + yearAdd);
+        while (dayNumber >= month.getDayAsInt()) {
+            dayNumber -= month.getDayAsInt();
+            month = month.getNextMonth(getYear() + yearAdd);
+            if (month.equals(Month.January))
+                yearAdd++;
+        }
+
+        //Days - now < 31
+        if (getDay() + dayNumber > month.getDayAsInt()){
+            dayNumber = abs(month.getDayAsInt() - getDay() - dayNumber);
+            month = month.getNextMonth(getYear() + yearAdd);
+            if (month.equals(Month.January))
+                yearAdd++;
+        }
+
+        return new Date(
+                String.valueOf(getYear() + yearAdd),
+                String.valueOf(month.getMonthAsInt()),
+                String.valueOf(getDay() + dayNumber));
 
     }
 
@@ -96,19 +122,20 @@ public class Date{
     }
 
 
-
     public int getYear() {
         return Integer.parseInt(year);
     }
 
-    public int getMonth() {
+    private int getMonth() {
         return Integer.parseInt(month);
     }
 
-    public int getDay() {
+    private int getDay() {
         return Integer.parseInt(day);
     }
 
+
+    //        ISO 4217
     @Override
     public String toString() {
 
@@ -125,4 +152,8 @@ public class Date{
         return output;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return this.toString().equals(obj.toString());
+    }
 }

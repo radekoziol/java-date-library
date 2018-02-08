@@ -5,9 +5,9 @@ public class Year{
 
     /**
      * @param year
-     * @return
+     * @return true if given year is a leap year
      */
-    public boolean isLeapYear(int year){
+    public static boolean isLeapYear(int year){
         if (year % 4 != 0) return false;
         else if (year % 100 != 0) return true;
         else if (year % 400 != 0) return false;
