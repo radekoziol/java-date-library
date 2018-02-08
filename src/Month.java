@@ -1,11 +1,13 @@
 /**
- *
+ * Handles useful month methods.
  */
 public enum Month {
 
-
     January("31"),
     February1("28"),
+    /**
+     * Leap year February
+     */
     February2("29"),
     March("31"),
     April ("30"),
@@ -21,13 +23,18 @@ public enum Month {
 
     private String day;
 
-    public static void main(String[] args) {
-        System.out.println(Month.February2.ordinal());
-    }
+    /**
+     * @param day
+     */
     Month(String day){
         this.day = day;
     }
 
+    /**
+     * @param month as int
+     * @param year as int
+     * @return month as Enum Month
+     */
     public static Month getMonth(int month, int year){
         if(Year.isLeapYear(year) && month == 2)
             return February2;
@@ -36,7 +43,23 @@ public enum Month {
         return  Month.values()[month];
     }
 
+    /**
+     * @param day as int
+     * @param month as int
+     * @param year as int
+     * @return true if day is within month
+     * @throws IllegalArgumentException if day is not within month
+     */
+    public static boolean dayIsWithinMonth(int day, int month, int year) throws IllegalArgumentException{
+        Month m = Month.getMonth(month, year);
+        return m.getDayAsInt() - day >= 0;
 
+    }
+
+    /**
+     * @param year
+     * @return next month in given year
+     */
     public Month getNextMonth(int year){
 
         if(Year.isLeapYear(year) && this.equals(Month.January))
@@ -45,9 +68,12 @@ public enum Month {
             return Month.March;
         else
             return values()[(this.ordinal()+1) % values().length];
-
     }
 
+    /**
+     * @param year
+     * @return previous month in given year
+     */
     public Month getPreviousMonth (int year){
 
         if(!Year.isLeapYear(year) && this.equals(Month.March))
@@ -60,6 +86,10 @@ public enum Month {
             return values()[(this.ordinal()-1) % values().length];
     }
 
+
+    /**
+     * @return how many days month contains as int
+     */
     public int getDayAsInt() {
         return Integer.parseInt(day);
     }

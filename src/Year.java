@@ -1,5 +1,5 @@
 /**
- *
+ * Handles useful year methods.
  */
 public class Year{
 

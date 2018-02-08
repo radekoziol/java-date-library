@@ -1,10 +1,16 @@
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Tests for Date class
+ */
 class DateTest {
 
+    /**
+     * Tests wrong input cases
+     */
     @Test
     void wrongInput() {
 
