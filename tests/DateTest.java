@@ -1,3 +1,4 @@
+import com.sun.javaws.exceptions.InvalidArgumentException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -5,8 +6,48 @@ import static org.junit.jupiter.api.Assertions.*;
 class DateTest {
 
     @Test
-    void dayIsWithinMonth() {
+    void wrongInput() {
+
+        //Illegal input
+        assertThrows(IllegalArgumentException.class,
+                ()->{
+                    new Date("");
+                });
+        assertThrows(IllegalArgumentException.class,
+                ()->{
+                    new Date("test");
+                });
+        assertThrows(IllegalArgumentException.class,
+                ()->{
+                    new Date("2012-2-xd");
+                });
+        assertThrows(IllegalArgumentException.class,
+                ()->{
+                    new Date("2012-12-'2");
+                });
+
+        //Invalid date
+        assertThrows(IllegalArgumentException.class,
+                ()->{
+                    new Date("-2012-2-2");
+                });
+        assertThrows(IllegalArgumentException.class,
+                ()->{
+                    new Date("2012-13-2");
+                });
+        assertThrows(IllegalArgumentException.class,
+                ()->{
+                    new Date("2012-2-244");
+                });
+
+        // Leap year case
+        assertThrows(IllegalArgumentException.class,
+                ()->{
+                    new Date("2013-2-29");
+                });
+
     }
+
 
     @Test
     void isLaterThan() {
@@ -30,13 +71,10 @@ class DateTest {
 
         // Leap Years cases
         assertTrue(new Date("2012-02-29").equals(new Date("2012-02-01").shiftDate(28    )));
-        assertTrue(new Date("2013-12-11").equals(new Date("2012-12-11").shiftDate(366)));
+        assertTrue(new Date("2013-02-11").equals(new Date("2012-02-11").shiftDate(366)));
+        assertTrue(new Date("2013-03-01").equals(new Date("2012-03-1").shiftDate(365)));
         assertTrue(new Date("2014-03-10").equals(new Date("2012-02-07").shiftDate(31 + 366 + 365)));
 
-    }
-
-    @Test
-    void getCurrentDate() {
     }
 
     @Test

@@ -2,6 +2,7 @@
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 
 import static java.lang.Math.abs;
 
@@ -16,51 +17,48 @@ public class Date{
     private String day;
 
     public static void main(String[] args) {
-        System.out.println(Date.dayDifference(
-                (new Date("2012-02-11")), (new Date("2013-02-11"))));
-//        System.out.println(new Date("2001-11-11").shiftDate(22));
-
+        Date date = new Date("2012-11-44");
     }
 
     //        ISO 4217
     public Date(String date){
+        checkDate(date);
         String [] temp = date.split("-",3);
-        checkDate(temp[0],temp[1],temp[2]);
         this.year = temp[0];
         this.month = temp[1];
         this.day = temp[2];
     }
 
     public Date(String year, String month, String day) {
-        checkDate(year,month,day);
+        checkDate(year + "-" + month  + "-" +  day);
         this.year = year;
         this.month = month;
         this.day = day;
     }
 
 
-    private void checkDate(String year, String month, String day) throws IllegalArgumentException {
+    private void checkDate(String input) throws IllegalArgumentException {
 
-        if(!( (Integer.parseInt(year) > 0 ) ||
-                ((Integer.parseInt(month) > 0) && (Integer.parseInt(month) <= 12)) ||
-                ((Integer.parseInt(day) > 0) && (Integer.parseInt(day) <= 31)) ||
-                (dayIsWithinMonth(Integer.parseInt(day),Integer.parseInt(month))) ))
-            throw new IllegalArgumentException("This date is impossible!");
+        if(!input.matches("\\d{4}-\\d{1,2}-\\d{1,2}"))
+            throw new IllegalArgumentException("This date: " + input + " is impossible!");
+
+        String [] temp = input.split("-",3);
+        int year = Integer.parseInt(temp[0]);
+        int month = Integer.parseInt(temp[1]);
+        int day = Integer.parseInt(temp[2]);
+
+        if(!( ((year > 0 ) && ((month > 0))
+                && (month<= 12)) && ((day > 0)
+                && (day <= 31)) && (dayIsWithinMonth(day,month,year)) ))
+            throw new IllegalArgumentException("This date: " + input + " is impossible!");
 
     }
 
-    private boolean dayIsWithinMonth(int day, int month) throws IllegalArgumentException{
 
-        switch (month){
-            case 1: case 3: case 5: case 7: case 8: case 10: case 12:{
-                return (day >= 0) && (day <= 31);
-            }
-            case 4: case 6: case 9: case 11:{
-                return (day >= 0) && (day <= 30);
-            }
-            default:
-                return (day >= 0) && (day <= 29);
-        }
+    private boolean dayIsWithinMonth(int day, int month, int year) throws IllegalArgumentException{
+
+        Month m = Month.getMonth(month, year);
+        return m.getDayAsInt() - day >= 0;
 
     }
 
