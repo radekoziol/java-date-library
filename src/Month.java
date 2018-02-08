@@ -22,7 +22,7 @@ public enum Month {
     private String day;
 
     public static void main(String[] args) {
-        System.out.println(getMonth(0,2013));
+        System.out.println(Month.February2.ordinal());
     }
     Month(String day){
         this.day = day;

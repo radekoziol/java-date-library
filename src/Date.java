@@ -1,16 +1,14 @@
 
+import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 
 import static java.lang.Math.abs;
 
 
-/*
-    This class cares for dates
+/**
+ *
  */
-
 public class Date{
 
     private String year;
@@ -18,7 +16,10 @@ public class Date{
     private String day;
 
     public static void main(String[] args) {
-        System.out.println(new Date("2003-01-01").shiftDate(100));
+        System.out.println(Date.dayDifference(
+                (new Date("2012-02-11")), (new Date("2013-02-11"))));
+//        System.out.println(new Date("2001-11-11").shiftDate(22));
+
     }
 
     //        ISO 4217
@@ -48,9 +49,7 @@ public class Date{
 
     }
 
-    //TODO leap year are not considered
-
-    public boolean dayIsWithinMonth(int day, int month) throws IllegalArgumentException{
+    private boolean dayIsWithinMonth(int day, int month) throws IllegalArgumentException{
 
         switch (month){
             case 1: case 3: case 5: case 7: case 8: case 10: case 12:{
@@ -68,29 +67,41 @@ public class Date{
 
     //        ISO 4217
     public boolean isLaterThan(Date endDate) {
-        return this.getYear() - endDate.getYear() > 0
-            && this.getMonth() - endDate.getMonth() > 0
-                && this.getDay() - endDate.getDay() > 0;
+
+        if(this.getYear() - endDate.getYear() > 0)
+            return true;
+        else if (this.getYear() - endDate.getYear() < 0)
+            return false;
+        else if (this.getMonth() - endDate.getMonth() > 0)
+            return true;
+        else if (this.getMonth() - endDate.getMonth() < 0)
+            return false;
+        else return this.getDay() - endDate.getDay() > 0;
     }
 
 
     public Date shiftDate(int dayNumber) {
 
         int yearAdd = 0;
+        Month month = Month.getMonth(getMonth(), getYear() + yearAdd);
 
         //YEARS
         while (dayNumber >= 365) {
-            if (Year.isLeapYear(getYear() + yearAdd) && dayNumber >= 366) {
+            if (Year.isLeapYear(getYear() + yearAdd)
+                    && dayNumber >= 366
+                    && month.ordinal() <= 2) {
                 yearAdd++;
                 dayNumber -= 366;
-            } else {
+            } else if (!Year.isLeapYear(getYear() + yearAdd)){
                 yearAdd++;
                 dayNumber -= 365;
             }
+            else
+                break;
         }
 
         //MONTHS
-        Month month = Month.getMonth(getMonth(), getYear() + yearAdd);
+        month = Month.getMonth(getMonth(), getYear() + yearAdd);
         while (dayNumber >= month.getDayAsInt()) {
             dayNumber -= month.getDayAsInt();
             month = month.getNextMonth(getYear() + yearAdd);
@@ -98,18 +109,74 @@ public class Date{
                 yearAdd++;
         }
 
+
         //Days - now < 31
         if (getDay() + dayNumber > month.getDayAsInt()){
             dayNumber = abs(month.getDayAsInt() - getDay() - dayNumber);
+            System.out.println(dayNumber);
             month = month.getNextMonth(getYear() + yearAdd);
             if (month.equals(Month.January))
                 yearAdd++;
         }
+        else
+            dayNumber += getDay();
 
         return new Date(
                 String.valueOf(getYear() + yearAdd),
                 String.valueOf(month.getMonthAsInt()),
-                String.valueOf(getDay() + dayNumber));
+                String.valueOf(dayNumber));
+
+    }
+
+    public static int dayDifference(Date startDate, Date endDate) {
+
+        int yearDifference = abs(startDate.getYear() - endDate.getYear());
+        int sign = (int) Math.signum(startDate.getYear() - endDate.getYear());
+
+        if(sign > 0)
+            return -1 * searchBinaryDayDifference
+                (0,((yearDifference + 1) * 365), endDate, startDate);
+
+        else if(sign < 0)
+            return searchBinaryDayDifference
+                    (0,((yearDifference + 1) * 365), startDate, endDate);
+
+        else if (startDate.isLaterThan(endDate))
+            return -1 * searchBinaryDayDifference
+                    ( 0,(365), endDate, startDate);
+
+        return searchBinaryDayDifference
+                ( 0,(365), startDate, endDate);
+    }
+
+    private static int searchBinaryDayDifference(int l, int r, Date startDate, Date endDate) {
+
+        while(l != r) {
+            System.out.println("RANGE OF: " + l + "," +r );
+
+            int mid = (l + r) / 2;
+            System.out.println("MID: " + mid);
+
+            System.out.println(startDate);
+            System.out.println(endDate);
+            System.out.println(startDate.shiftDate(mid));
+            System.out.println(startDate.shiftDate(mid).isLaterThan(endDate));
+
+            if (startDate.shiftDate(mid).equals(endDate))
+                return mid;
+
+            if(l == r-1)
+                return 0;
+
+            if (startDate.shiftDate(mid).isLaterThan(endDate))
+                r = mid;
+            else {
+
+                l = mid;
+            }
+
+        }
+        return 0;
 
     }
 
